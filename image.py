@@ -431,22 +431,48 @@ class ImageProcessing():
 
 
 
+        """THIS METHOD OF FINDING NEIGHBOURS IS FASTER FOR LOW NUMBERS OF LABELS BUT SLOWER FOR LARGER IMAGES WITH MORE LABELLED REGIONS"""
         # finds all neighbours of each labelled region. For each slice, enlarges labelled regions to fill gaps (gives enlarged)
         # loops through each region, gets that region alone, increases its size by 1 then logical_ands it to enlarged,
         # getting all neighbouring regions. Removes 0 and own label from list, then appends it to list of neighbours for that region.
-        buffer = 1
+
+        
+        """buffer = 1
         for n, slice in enumerate(self.segmented_image):
             enlarged = ski.segmentation.expand_labels(label_image = slice,
                                                                     distance = settings.adjacency["adjacency_expansion_distance"]) 
+
             labels = np.unique(enlarged)
             enlarged_segments[n] = enlarged
             for label in labels:
                 label_region = ski.segmentation.expand_labels((enlarged == label), buffer)
-                neighbours = np.unique(np.logical_and(label_region, enlarged) * enlarged)
+                neighbours = np.unique(np.logical_and(label_region,enlarged) * enlarged)
                 neighbours = neighbours[(neighbours != label)][1:]
-                adjacent_region_list[label] = np.unique(np.append(adjacent_region_list[label], [int(neighbour) for neighbour in neighbours])).astype(np.int32)
+                adjacent_region_list[label] = np.unique(np.append(adjacent_region_list[label], [int(neighbour) for neighbour in neighbours])).astype(np.int32)"""
 
-                
+        """THIS IS SLOWER FOR SMALL NUMBERS OF LABELS (ski.graph.RAG IS FAIRLY SLOW) BUT FASTER FOR LARGE NUMBERS OF LABELS (LESS GOING ON IN LOOP OVER LABELS)"""
+        #if data has been segmented, for each slice:
+        #enlarge regions by expansion distance
+        #use RAG graph to get data about regions
+        #for each region that exists in current slice, get neighbours and append to list
+        
+
+        for i in range(self.n_slices):
+            print("Measuring adjacency slice", i + 1)
+            enlarged_segments[i] = ski.segmentation.expand_labels(label_image = self.segmented_image[i],
+                                                                            distance = settings.adjacency["adjacency_expansion_distance"])   
+               
+            graph = ski.graph.RAG(enlarged_segments[i], connectivity = 2)
+
+            for segment in np.unique(enlarged_segments[i]):
+                for adjacent_segment in list(graph.neighbors(segment)):
+                    adjacent_region_list[segment].append(adjacent_segment)
+
+        #remove non-unique regions and region 0 (background) from all adjacency lists
+        for i in range(self.n_labels + 1):
+            adjacent_region_list[i] = np.unique(adjacent_region_list[i])
+            adjacent_region_list[i] = np.delete(adjacent_region_list[i], np.where(adjacent_region_list[i] == 0))
+
         # go through each region - if the value of the channel of interest is above threshold, give adjaceny of 0
         # (for 0 cells to GFP) - if not, adds region number to list of remaining regions to test
 
@@ -471,6 +497,7 @@ class ImageProcessing():
         #print(*[(n, int(item)) for (n, item) in enumerate(adjacency_values)],sep = "\n") 
 
         self.adjacency_calculated = True
+        
         print("Adjacency Completed\n")
         
     def analyse(self):

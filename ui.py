@@ -136,6 +136,8 @@ class MainWindow(QMainWindow):
                 new_channels = self.parent.str_to_int(self.channel_input.text())
 
                 new_analysis_dict = {}
+                # if an image is openened with a different number of analysis, rebuilds relevant analysis variables lists in settings with correct number of members
+
                 if new_analyses < settings.analysis["n_analyses"]:
                     for key, value in settings.analysis.items():
                         if type(value) == list:
@@ -166,21 +168,15 @@ class MainWindow(QMainWindow):
                 settings.channels["n_channels"] = new_channels
                 
                 self.parent.current_image.open_image(self.file_name)
-                
 
+                # clears and updates window widgets for new analysis
+                # this could be tidied up - only two sections really need clearing, the left layout and threshold tab layout
                 self.parent.clear_page(self.parent.wlayout)
                 self.parent.container.deleteLater()
                 self.parent.container = QWidget()
                 self.parent.wlayout = self.parent.create_main_layout()
                 self.parent.container.setLayout(self.parent.wlayout)
                 self.parent.setCentralWidget(self.parent.container)
-
-                
-
-
-
-
-
 
                 self.parent.ZSlider.setMaximum(self.parent.current_image.n_slices)
                 self.parent.draw_image()
