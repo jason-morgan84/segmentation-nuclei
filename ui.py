@@ -40,7 +40,6 @@ class MainWindow(QMainWindow):
 
         return wlayout
 
-
     def _createMenuBar(self):
 
         #def export_output_button(self):
@@ -90,7 +89,6 @@ class MainWindow(QMainWindow):
         self.ImageBoxLeft.figure.savefig("left.png", bbox_inches = 'tight')
         self.ImageBoxRight.figure.savefig("right.png", bbox_inches = 'tight')
         print("Images Exported")
-
 
     def open_image_window(self):
 
@@ -315,11 +313,14 @@ class MainWindow(QMainWindow):
                             cmap='Greys')
 
         #for left and right output views, clears current content and gets new content
-        self.ax1.cla()
-        get_new_output(self.left_view_input.currentText(), self.ax1)
-        
-        self.ax2.cla()
-        get_new_output(self.right_view_input.currentText(), self.ax2)
+
+        if self.left_view_lock.isChecked() == False:
+            self.ax1.cla()
+            get_new_output(self.left_view_input.currentText(), self.ax1)
+
+        if self.right_view_lock.isChecked() == False:
+            self.ax2.cla()
+            get_new_output(self.right_view_input.currentText(), self.ax2)
 
         if self.OutlineCheck.isChecked() == True:
             labels=ski.segmentation.find_boundaries(self.current_image.segmented_image[self.ZSlider.value() - 1],mode='thick')
@@ -340,7 +341,6 @@ class MainWindow(QMainWindow):
         self.ImageBoxLeft.draw()
         self.ImageBoxRight.draw()
 
-
     def str_to_int(self, input):
             try:
                 return int(input)
@@ -354,6 +354,7 @@ class MainWindow(QMainWindow):
                 return 0
           
     def setting_change(self, dictionary, variable, value, idx = None):
+        # this function is connected to UI input elements and changes the relvent setting in settings.py, by dictionary, variable name and, if necessary, analysis index.
         if idx == None:
             dictionary[variable] = value
         else:
@@ -885,25 +886,44 @@ class MainWindow(QMainWindow):
                          'Enlarged Cells',
                          'Adjacent Output']
 
+    
         self.views=QtWidgets.QVBoxLayout()
-        left_view_label=QtWidgets.QLabel("Left:")
+
+        self.left_view_layout = QtWidgets.QHBoxLayout()
+        left_view_label = QtWidgets.QLabel("Left:")
+        left_view_label.setFixedWidth(30)
         self.left_view_input = QtWidgets.QComboBox()
         self.left_view_input.addItems(view_options)
-        self.left_view_input.setMinimumWidth(180)
+        self.left_view_input.setMinimumWidth(150)
         self.left_view_input.setCurrentText('Input')
         self.left_view_input.currentTextChanged.connect(lambda: self.draw_image())
-        right_view_label=QtWidgets.QLabel("Right:")
-        self.right_view_input = QtWidgets.QComboBox()
-        self.right_view_input.addItems(view_options)
-        self.right_view_input.setMinimumWidth(180)
-        self.right_view_input.setCurrentText('Seg: Output (4)')
-        self.right_view_input.currentTextChanged.connect(lambda: self.draw_image())
-        self.left_view_layout=QtWidgets.QHBoxLayout()
-        self.right_view_layout=QtWidgets.QHBoxLayout()
+        self.left_view_lock_label = QtWidgets.QLabel("Lock:")
+        self.left_view_lock = QtWidgets.QCheckBox()
+        self.left_view_lock.setChecked(False)
+
         self.left_view_layout.addWidget(left_view_label)
         self.left_view_layout.addWidget(self.left_view_input)
+        self.left_view_layout.addWidget(self.left_view_lock_label)
+        self.left_view_layout.addWidget(self.left_view_lock)
+
+
+        self.right_view_layout=QtWidgets.QHBoxLayout()
+        right_view_label=QtWidgets.QLabel("Right:")
+        right_view_label.setFixedWidth(30)
+        self.right_view_input = QtWidgets.QComboBox()
+        self.right_view_input.addItems(view_options)
+        self.right_view_input.setMinimumWidth(150)
+        self.right_view_input.setCurrentText('Seg: Output (4)')
+        self.right_view_input.currentTextChanged.connect(lambda: self.draw_image())
+        self.right_view_lock_label = QtWidgets.QLabel("Lock:")
+        self.right_view_lock = QtWidgets.QCheckBox()
+        self.right_view_lock.setChecked(False)     
+
+
         self.right_view_layout.addWidget(right_view_label)
         self.right_view_layout.addWidget(self.right_view_input)
+        self.right_view_layout.addWidget(self.right_view_lock_label)
+        self.right_view_layout.addWidget(self.right_view_lock)
 
 
         self.views.addLayout(self.left_view_layout)
