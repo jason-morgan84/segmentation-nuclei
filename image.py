@@ -19,7 +19,6 @@ class ImageProcessing():
         self.label_area = 0
         self.segmented = False
 
-        self.n_analyses = settings.analysis["n_analyses"]
         self.analyses = []
         self.analysed = False
 
@@ -83,8 +82,7 @@ class ImageProcessing():
         self.analysed = False
         self.adjacency_calculated = False
 
-        for i in range (self.n_analyses):
-            self.analyses.append(self.AnalysisData(self, i))
+
     
     def segment(self):
         def remove_dark_regions(input_image, intensity_image, min_intensity):
@@ -144,7 +142,6 @@ class ImageProcessing():
             #create final version of slice by adding filled overlapping label set to unique to this slice label set
             output, _, _ = ski.segmentation.relabel_sequential(unique + filled)
             return output
-        
         def distance_segment(input_image, intensity_image, min_distance, min_solidity, max_nuclear_area, min_ratio_circularity):
             # carries out distance segmentation on input image.
             # input is assumed to be a binary image with 1 as foreground (nuclei) and 0 as background
@@ -328,9 +325,14 @@ class ImageProcessing():
         self.segmented = True
 
     def threshold(self):
+
         # Goes through each analysis, first gets thresholding values from z-projected stack (so consistent thresholding values can 
         # be used based on the brightest values for the whole stack)
         # Each slice is then thresholded based on the calculated value
+
+        for i in range (settings.analysis["n_analyses"]):
+            self.analyses.append(self.AnalysisData(self, i))
+
         threshold_methods = {"Li": ski.filters.threshold_li, 
                              "Isodata": ski.filters.threshold_isodata,
                              "Mean": ski.filters.threshold_mean, 
@@ -342,7 +344,7 @@ class ImageProcessing():
         for analysis in self.analyses:
             print("Analysing", analysis.name,
                 "in channel", analysis.channel + 1,
-                "(of", str(self.n_analyses) + ")",
+                "(of", str(settings.analysis["n_analyses"]) + ")",
                 "with sigma of", analysis.sigma,
                 "and", analysis.threshold_method,
                 "thresholding gives", end = " ")
@@ -502,7 +504,7 @@ class ImageProcessing():
         
     def analyse(self):
         self.analyses = []
-        for i in range (self.n_analyses):
+        for i in range (settings.analysis["n_analyses"]):
             self.analyses.append(self.AnalysisData(self, i))
         self.threshold()
         if self.n_labels == 0:

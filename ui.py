@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
 
             def ok_button(self):
                 new_analyses = self.parent.str_to_int(self.analyses_input.text())
-                new_channels = self.parent.str_to_int(self.channel_input.text())
+
 
                 new_analysis_dict = {}
                 # if an image is openened with a different number of analysis, rebuilds relevant analysis variables lists in settings with correct number of members
@@ -153,7 +153,30 @@ class MainWindow(QMainWindow):
                                 value.append(value[0])
                         new_analysis_dict.update({key:value})
 
+                view_options = ['Input',
+                    'Seg: After Region (1)',
+                    'Seg: After Distance (2)', 
+                    'Seg: After Stack (3)',
+                    'Seg: Output (4)',]
+        
+                for analysis in range (settings.analysis["n_analyses"]):
+                    view_options.append('Thresh: Analysis ' + str(analysis + 1))
+
+                    
+                
+                view_options.append('Enlarged Cells')
+                view_options.append('Adjacent Output')
+                self.parent.left_view_input.clear()
+                self.parent.left_view_input.addItems(view_options)
+
+                self.parent.right_view_input.clear()
+                self.parent.right_view_input.addItems(view_options)
+        
+
                 settings.analysis["n_analyses"] = new_analyses
+
+
+                new_channels = self.parent.str_to_int(self.channel_input.text())
 
                 if settings.channels["dapi_channel"] > new_channels:
                     settings.channels["dapi_channel"] = new_channels
@@ -161,7 +184,6 @@ class MainWindow(QMainWindow):
                 for n, item in enumerate(settings.analysis["analysis_channels"]):
                     if item > new_channels:
                         settings.analysis["analysis_channels"][n] = new_channels
-
 
                 settings.channels["n_channels"] = new_channels
                 
@@ -296,21 +318,20 @@ class MainWindow(QMainWindow):
                     view.imshow(adjacency_output[self.ZSlider.value()-1],
                                 cmap = LUTs.adjacent_cmap,
                                 interpolation='none')
+                    
             elif option== 'Seg: Output (4)':
                 view.imshow(self.current_image.segmented_image[self.ZSlider.value() - 1], 
                             cmap = LUTs.label_cmap, 
                             vmin = 0, 
                             vmax = self.current_image.n_labels, 
                             interpolation='none')
-            elif option=="Thresh: Analysis 1":
-                view.imshow(self.current_image.analyses[0].thresholded_image[self.ZSlider.value() - 1],
+                
+            elif "Thresh: Analysis" in option:
+                analysis = int(option[-1])
+
+                view.imshow(self.current_image.analyses[analysis - 1].thresholded_image[self.ZSlider.value() - 1],
                             cmap='Greys')
-            elif option=="Thresh: Analysis 2":
-                view.imshow(self.current_image.analyses[1].thresholded_image[self.ZSlider.value() - 1],
-                            cmap='Greys')
-            elif option=="Thresh: Analysis 3":
-                view.imshow(self.current_image.analyses[2].thresholded_image[self.ZSlider.value() - 1],
-                            cmap='Greys')
+
 
         #for left and right output views, clears current content and gets new content
 
@@ -879,12 +900,13 @@ class MainWindow(QMainWindow):
                          'Seg: After Region (1)',
                          'Seg: After Distance (2)', 
                          'Seg: After Stack (3)',
-                         'Seg: Output (4)',
-                         'Thresh: Analysis 1',
-                         'Thresh: Analysis 2',
-                         'Thresh: Analysis 3',
-                         'Enlarged Cells',
-                         'Adjacent Output']
+                         'Seg: Output (4)',]
+        
+        for analysis in range (settings.analysis["n_analyses"]):
+            view_options.append('Thresh: Analysis ' + str(analysis + 1))
+        
+        view_options.append('Enlarged Cells')
+        view_options.append('Adjacent Output')
 
     
         self.views=QtWidgets.QVBoxLayout()
