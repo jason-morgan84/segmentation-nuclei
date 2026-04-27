@@ -69,7 +69,10 @@ class ImageProcessing():
         for i in range(self.n_slices):
             for j in range(n_channels):
                 self.opened_image.seek(i * n_channels + j)
+                # if slices and channels seem to be reversed, try uncommenting following line and commenting line above.
+                # self.opened_image.seek(j * n_channels + i)
                 self.input_image[i,j] = ski.img_as_ubyte(np.asarray(self.opened_image))
+          
 
         self.after_region = np.zeros((self.n_slices, self.height, self.width), dtype = np.int32)
         self.segmented_image = np.zeros((self.n_slices, self.height, self.width), dtype = np.int32)
