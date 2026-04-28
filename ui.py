@@ -132,7 +132,6 @@ class MainWindow(QMainWindow):
             def ok_button(self):
                 new_analyses = self.parent.str_to_int(self.analyses_input.text())
 
-
                 new_analysis_dict = {}
                 # if an image is openened with a different number of analysis, rebuilds relevant analysis variables lists in settings with correct number of members
 
@@ -153,28 +152,8 @@ class MainWindow(QMainWindow):
                                 value.append(value[0])
                         new_analysis_dict.update({key:value})
 
-                view_options = ['Input',
-                    'Seg: After Region (1)',
-                    'Seg: After Distance (2)', 
-                    'Seg: After Stack (3)',
-                    'Seg: Output (4)',]
-        
-                for analysis in range (settings.analysis["n_analyses"]):
-                    view_options.append('Thresh: Analysis ' + str(analysis + 1))
-
-                    
-                
-                view_options.append('Enlarged Cells')
-                view_options.append('Adjacent Output')
-                self.parent.left_view_input.clear()
-                self.parent.left_view_input.addItems(view_options)
-
-                self.parent.right_view_input.clear()
-                self.parent.right_view_input.addItems(view_options)
-        
-
+                settings.analysis = new_analysis_dict.copy()
                 settings.analysis["n_analyses"] = new_analyses
-
 
                 new_channels = self.parent.str_to_int(self.channel_input.text())
 
@@ -258,7 +237,6 @@ class MainWindow(QMainWindow):
             self.thresh_analysis_section[i].erode_input.setText(str(settings.analysis["erode"][i]))
 
         self.intensity_enable.setChecked(settings.analysis["measure_intensity"])
-        self.intensity_analysis_input.setCurrentText(settings.analysis["intensity_channel"])
 
         self.adjacency_enable_input.setChecked(settings.adjacency["measure_adjacency"])
         self.adjacency_threshold_input.setText(str(settings.adjacency["adjacency_threshold"]))
@@ -511,11 +489,9 @@ class MainWindow(QMainWindow):
 
         def rename_analysis(self, parent, index):
             settings.analysis["analysis_names"][index] = parent.thresh_analysis_section[index].name_input.text()
-            parent.intensity_analysis_input.clear()
             parent.channel_selector_input.clear()
             for i in range(settings.analysis["n_analyses"]):
                 parent.channel_selector_input.addItem(parent.thresh_analysis_section[i].name_input.text())
-                parent.intensity_analysis_input.addItem(parent.thresh_analysis_section[i].name_input.text())
 
         def segmentation_tab(self):
 
@@ -764,22 +740,11 @@ class MainWindow(QMainWindow):
 
             
             self.intensity_layout = QtWidgets.QHBoxLayout()
-            self.intensity_enable = QtWidgets.QCheckBox("Intensity")
+            self.intensity_enable = QtWidgets.QCheckBox("Measure absolute intensity")
             self.intensity_enable.setChecked(settings.analysis["measure_intensity"])
 
             self.intensity_enable.stateChanged.connect(lambda: self.setting_change(settings.analysis, "measure_intensity", self.intensity_enable.isChecked()))
-            self.intensity_analysis_label = QtWidgets.QLabel("Channel:")
-            self.intensity_analysis_input = QtWidgets.QComboBox()
-            for i in range(settings.analysis["n_analyses"]):
-                self.intensity_analysis_input.addItem(settings.analysis["analysis_names"][i])
-            self.intensity_analysis_input.setCurrentText(settings.analysis["intensity_channel"])
-            self.intensity_analysis_input.currentTextChanged.connect(lambda: self.setting_change(settings.analysis, "intensity_channel", self.intensity_analysis_input.currentText()))
-
-            #self.intensity_analysis_input.setMinimumWidth(100)
             self.intensity_layout.addWidget(self.intensity_enable)
-            self.intensity_layout.addWidget(self.intensity_analysis_label)
-            self.intensity_layout.addWidget(self.intensity_analysis_input)
-
 
             self.thresh_analysis_section = []
             for i in range(settings.analysis["n_analyses"]):
@@ -825,7 +790,7 @@ class MainWindow(QMainWindow):
             self.adjacency_enable_layout.addWidget(self.adjacency_enable_input)
 
             self.channel_selector_layout=QtWidgets.QHBoxLayout()
-            self.channel_selector_label=QtWidgets.QLabel("Channel:")
+            self.channel_selector_label=QtWidgets.QLabel("Analysis:")
             self.channel_selector_input = QtWidgets.QComboBox()
             for i in range(settings.analysis["n_analyses"]):
                 self.channel_selector_input.addItem(settings.analysis["analysis_names"][i])

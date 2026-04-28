@@ -17,7 +17,7 @@ sys.excepthook = myexcepthook
 
 
 #example ImageName
-file = "simpleexample.tif"
+file = "example.tif"
 
 
 images = image.ImageProcessing()

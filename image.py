@@ -84,9 +84,7 @@ class ImageProcessing():
         self.analyses = []
         self.analysed = False
         self.adjacency_calculated = False
-
-
-    
+  
     def segment(self):
         def remove_dark_regions(input_image, intensity_image, min_intensity):
             # expects input of a labelled image and an image with intensity values
@@ -332,9 +330,9 @@ class ImageProcessing():
         # Goes through each analysis, first gets thresholding values from z-projected stack (so consistent thresholding values can 
         # be used based on the brightest values for the whole stack)
         # Each slice is then thresholded based on the calculated value
-
-        for i in range (settings.analysis["n_analyses"]):
-            self.analyses.append(self.AnalysisData(self, i))
+        
+        #for i in range (settings.analysis["n_analyses"]):
+            #self.analyses.append(self.AnalysisData(self, i))
 
         threshold_methods = {"Li": ski.filters.threshold_li, 
                              "Isodata": ski.filters.threshold_isodata,
@@ -411,7 +409,7 @@ class ImageProcessing():
                     if prop.intensity_mean > analysis.max_threshold_intensity[n]: 
                         analysis.max_threshold_intensity[n] = prop.intensity_mean
 
-                if settings.analysis["measure_intensity"] == True and analysis.name == settings.analysis["intensity_channel"]:
+                if settings.analysis["measure_intensity"] == True:
                     properties = ski.measure.regionprops(label_image = self.segmented_image[i],
                                                         intensity_image = self.input_image[i][analysis.channel])
                     for prop in properties:
@@ -506,7 +504,10 @@ class ImageProcessing():
         print("Adjacency Completed\n")
         
     def analyse(self):
-        self.analyses = []
+        if self.analyses: 
+            self.analyses.clear()
+        else: 
+            self.analyses = []
         for i in range (settings.analysis["n_analyses"]):
             self.analyses.append(self.AnalysisData(self, i))
         self.threshold()
@@ -530,7 +531,8 @@ class ImageProcessing():
             headings = ["Cell",
                         "Area",
                         ",".join([name for name in settings.analysis["analysis_names"]]),]
-            if settings.analysis["measure_intensity"]: headings.append(settings.analysis["intensity_channel"] + "_intensity")
+            if settings.analysis["measure_intensity"] == True:
+                headings.append(",".join([name + "_intensity" for name in settings.analysis["analysis_names"]]))
             if settings.adjacency["measure_adjacency"]: headings.append(settings.adjacency["adjacency_analysis"] + "_adjacency")
             output_file.write(",".join(headings) + "\n")
 
@@ -548,7 +550,7 @@ class ImageProcessing():
                     output_file.write("0,")
 
             for analysis in self.analyses:
-                if analysis.name == settings.analysis["intensity_channel"]:
+                if settings.analysis["measure_intensity"] == True:
                     try:
                         output_file.write(str(analysis.max_absolute_intensity[i]) + ",")
                     except (AttributeError, IndexError):
