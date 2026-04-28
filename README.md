@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-The aim of this software is to segment DAPI stained nuclei in Z-stack images from confocal microscopes and to then measure absolute and thresholded intensity within those nuclei in channels of interest.
+The aim of this software is to segment DAPI stained nuclei in Z-stack images from confocal microscopes and to then measure absolute and thresholded intensity of channels of interest within those nuclei.
 
 The input should be an 8-bit tif (16- or 24- bit images may work, but may not) with DAPI in one channel (the software may work for other nuclear markers, depending on the settings used).
 
