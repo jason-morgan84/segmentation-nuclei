@@ -15,10 +15,15 @@ Requirements
 To use the software, the following libraries must be installed in Python:
 
 Matplotlib
+
 NumPy
+
 scikit-image (version 0.26.0)
+
 SciPy (version 1.17.1)
+
 PyQt6
+
 cmap (https://cmap-docs.readthedocs.io/en/latest/)
 
 Using the software UI
@@ -49,3 +54,17 @@ The analyses define how the software evaluates your images. Typically, there wou
 The number of channels and analyses can only be changed when opening a new image.
 
 Finally, chose a channel for your nuclear marker to the left side of the window.
+
+Settings
+--------
+Where settings have been changed, they can be imported or exported using the Settings menu.
+
+They can also be reset to the default settings, which can be changed by overwriting the default_settings.txt file.
+
+If the software crashes for any reason, the current settings will be saved in autosave.txt
+
+Settings can be changed manually, but any changes to the names of settings, rather than their values, will result in that setting file failing to load.
+
+Segmentation
+------------
+Segmentation is done by:
