@@ -7,8 +7,6 @@ The input should be an 8-bit tif (16- or 24- bit images may work, but may not) w
 
 The output is a list of segmented nuclei, along with their maximum area and maximum thresholded and absolute intensities in other channels in a comma-separated text file. Optionally, the minimum distance of each nuclei from a nucleus positive for a particular channel can also be output.
 
-Once the correct settings have been chosen, batch processing of large numbers of images is possible, and the folder structure will be maintained in the output file. For example, for the file "Plate1 Image2" in the sub-folder "260521\RasPositive" will have the data for each nucleus preceded by "260521,RasPositive,Plate1,Image2".
-
 Requirements
 ------------
 
@@ -67,4 +65,47 @@ Settings can be changed manually, but any changes to the names of settings, rath
 
 Segmentation
 ------------
-Segmentation is done by:
+Nuclei are segmented in three steps:
+
+1. Region segmentation using sobel edge detection and watershedding. This includes options for low and high threshold. These act as multipliers to the overall image intensity - any image pixel with an intensity below low threshold * average intensity are considered background for watershedding, any image pixel with an intensity over high threshold * average intensity are considered foreground (a nucleus).
+
+2. Distance segmentation to split up regions, using a distance transform then finding local maxima and watershedding (the minimum distance between maxima is a key property defining over- and under-segmentation of images).
+
+3. Stack segmentation. This loops up and down the slices looking for segmented regions in one slice that represents multiple segmented regions in neighbouring slices. The key setting here is minimum overlap size. If the area of overlap of two regions in neighbouring slices is less than this value, that overlap will not be used to split up those regions.
+
+Other settings for segmentation define properties for an object to be considered a nucleus. Objects that are smaller (or larger), less circular, less solid (a measure of concavity of the object), less bright (as a multiple of average image intensity) are not considered to be nuclei.
+
+Thresholding
+------------
+The threshold function binarises images using a chosen auto-thresholding techniques for each analyis (set up in the Threshold tab).
+
+For each analysis, you can choose whether a background subtraction is performed (and its radius), whether a guassian filter is applied (and its radius), whether any erosion is applied to the final thresholded image (to counteract the effects of gaussian filter) and an auto-thresholding method.
+
+Available methods of auto-thresholding are:
+    Isodata
+    Li
+    Mean
+    Minimum
+    Otsu
+    Triangle
+    Yen    
+
+The maximum intensity of the thresholded image in each segmented region (comparing across slices) is then saved for export, along with the maximum area of that region and the maximum intensity of the unprocessed image.
+
+Adjacency
+---------
+The adjacency functions allows you to quantify the minimum distance of each nucleus from a nucleus positive for a marker in a given channel. It does this by enlarging each segment to fill gaps, finding the neighbour(s) of each nucleus then looping through each label to calculate the minimum distance from a positive cell.
+
+Settings are the analysis of interest, the minimum thresholded intensity a segment should be to be considered positive for this analysis, the maximum number of nuclei distance to calculate and how much to enlarge each segment.
+
+
+Batch Processing
+----------------
+Once the correct settings have been chosen, batch processing of large numbers of images is possible.
+
+To do this, choose 'Batch Processing' from the file menu and select a folder. The folder structure will be maintained in the output file, and file names will be split at spaces. 
+
+For example, for the file "Plate1 Image2" in the sub-folder "260521\RasPositive", the output data for each nucleus will be preceded by "260521,RasPositive,Plate1,Image2".
+
+
+
