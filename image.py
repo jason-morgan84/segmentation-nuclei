@@ -533,7 +533,7 @@ class ImageProcessing():
                         ",".join([name for name in settings.analysis["analysis_names"]]),]
             if settings.analysis["measure_intensity"] == True:
                 headings.append(",".join([name + "_intensity" for name in settings.analysis["analysis_names"]]))
-            if settings.adjacency["measure_adjacency"]: headings.append(settings.adjacency["adjacency_analysis"] + "_adjacency")
+            if settings.adjacency["measure_adjacency"]: headings.append(settings.adjacency["analysis_for_adjacency"] + "_adjacency")
             output_file.write(",".join(headings) + "\n")
 
         for i in range(1, self.n_labels + 1):
