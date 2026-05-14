@@ -134,7 +134,6 @@ class MainWindow(QMainWindow):
 
                 new_analysis_dict = {}
                 # if an image is openened with a different number of analysis, rebuilds relevant analysis variables lists in settings with correct number of members
-
                 if new_analyses < settings.analysis["n_analyses"]:
                     for key, value in settings.analysis.items():
                         if type(value) == list:
@@ -144,6 +143,8 @@ class MainWindow(QMainWindow):
                             new_analysis_dict.update({key:new_list})
                         else:
                             new_analysis_dict.update({key:value})
+                    settings.analysis = new_analysis_dict.copy()
+                    settings.analysis["n_analyses"] = new_analyses
                 
                 elif new_analyses > settings.analysis["n_analyses"]:
                     for key, value in settings.analysis.items():
@@ -151,9 +152,8 @@ class MainWindow(QMainWindow):
                             for i in range(new_analyses - settings.analysis["n_analyses"]):
                                 value.append(value[0])
                         new_analysis_dict.update({key:value})
-
-                settings.analysis = new_analysis_dict.copy()
-                settings.analysis["n_analyses"] = new_analyses
+                    settings.analysis = new_analysis_dict.copy()
+                    settings.analysis["n_analyses"] = new_analyses
 
                 new_channels = self.parent.str_to_int(self.channel_input.text())
 
