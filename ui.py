@@ -509,7 +509,7 @@ class MainWindow(QMainWindow):
             sigma_label=QtWidgets.QLabel("Gaussian Blur Sigma:")
             self.sigma_input=QtWidgets.QLineEdit(str(settings.segmentation["segment_sigma"]))
             self.sigma_input.setMaximumWidth(40)
-            self.sigma_input.textChanged.connect(lambda: self.setting_change(settings, "segmentation['segment_sigma']", self.str_to_float(self.sigma_input.text())))
+            self.sigma_input.textChanged.connect(lambda: self.setting_change(settings.segmentation, "segment_sigma", self.str_to_float(self.sigma_input.text())))
             sigma_layout.addWidget(sigma_label)
             sigma_layout.addWidget(self.sigma_input)
 
