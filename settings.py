@@ -61,14 +61,16 @@ def import_settings(file_name, default = False):
             for key, value in section.items():
                 new_key, new_value = input_file.readline().rstrip().split(" = ")
                 if key == new_key:
-
                     if "," in new_value: 
                         # if line contains a list, remove punctuation and split into list
                         # then convert each item in list to proper type
                         new_value = new_value.replace("[","").replace("]","").replace("'","").split(", ")
                         for n, item in enumerate(new_value):
-                            new_value[n] = type(value[0])(item)
+                            try:
+                                new_value[n] = eval(item)
 
+                            except NameError:
+                                new_value[n] = new_value[n]
                     section[new_key] = type(value)(new_value)
                 else:
                     success = False
