@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.open_action = QAction("&Open Image", self)
         self.open_action.triggered.connect(self.open_image_window)
         self.export_action = QAction("&Export Output", self)
-        self.export_action.triggered.connect(lambda: self.current_image.export_output(True))
+        self.export_action.triggered.connect(lambda: self.current_image.export_output(heading = True, echo = True))
         self.batch_action = QAction("&Batch Process", self)
         self.batch_action.triggered.connect(self.open_batch_window)
         self.export_image_action = QAction("Export &Images", self)

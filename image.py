@@ -516,7 +516,7 @@ class ImageProcessing():
         else:
             self.quantify_threshold()
 
-    def export_output(self, heading, file_name = "default", prefix = ""):
+    def export_output(self, heading, file_name = "default", prefix = "", echo = False):
             
 
         if file_name == "default":
@@ -568,7 +568,7 @@ class ImageProcessing():
 
 
         output_file.close()
-        print("Save Completed")     
+        if echo == True: print("Output Completed")     
     
     def batch(self, path):
         global nSlices
@@ -578,7 +578,6 @@ class ImageProcessing():
 
         #app.quit()
         file_name = os.path.join(path,"batch.txt")
-        print(file_name)
 
         file_list = []
         file_number = 0
