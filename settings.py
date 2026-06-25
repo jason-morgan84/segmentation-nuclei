@@ -43,7 +43,6 @@ settings_sections = [segmentation, channels, analysis, adjacency]
 
 
 def export_settings(file_name, auto_save = False):
-    print(file_name)
     with open(file_name, "w") as output_file:
         for section in settings_sections:
             for key, value in section.items():
