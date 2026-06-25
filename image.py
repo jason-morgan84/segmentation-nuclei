@@ -37,6 +37,7 @@ class ImageProcessing():
             self.background_radius = settings.analysis["background_radius"][index]
             self.sigma = settings.analysis["sigma"][index]
             self.erode = settings.analysis["erode"][index]
+            self.stack_behaviour = settings.analysis["stack behaviour"][index]
             self.measure_absolute_intensity = settings.analysis["measure_intensity"]
 
             self.adjacency_expansion_distance = settings.adjacency["adjacency_expansion_distance"]
@@ -350,22 +351,23 @@ class ImageProcessing():
                 "and", analysis.threshold_method,
                 "thresholding gives", end = " ")
             
-            if analysis.threshold_method != "None":
-                maxproject = np.max(self.input_image[:,analysis.channel], axis=0)
+            if analysis.stack_behaviour == "Stack":
+                if analysis.threshold_method != "None":
+                    maxproject = np.max(self.input_image[:,analysis.channel], axis=0)
 
-                if analysis.background_subtract == 1:
-                    background = ski.restoration.rolling_ball(maxproject, radius = analysis.background_radius)
-                    maxproject = (maxproject - background)
+                    if analysis.background_subtract == 1:
+                        background = ski.restoration.rolling_ball(maxproject, radius = analysis.background_radius)
+                        maxproject = (maxproject - background)
+                    
+                    if analysis.sigma > 0:
+                        maxproject = ndimage.gaussian_filter(maxproject, analysis.sigma)
+
+                    threshold = threshold_methods[analysis.threshold_method](maxproject)
                 
-                if analysis.sigma > 0:
-                    maxproject = ndimage.gaussian_filter(maxproject, analysis.sigma)
-
-                threshold = threshold_methods[analysis.threshold_method](maxproject)
-            
-            else:
-                threshold = 0
+                else:
+                    threshold = 0
            
-            print(threshold)
+                print(threshold)
 
             for j in range(self.n_slices):
 
@@ -381,12 +383,17 @@ class ImageProcessing():
                                                         analysis.thresholded_image[j], 
                                                         analysis.sigma)
     
-                if analysis.threshold_method != "None":
+                if analysis.stack_behaviour == "Stack" and analysis.threshold_method != "None":
                     analysis.thresholded_image[j] = analysis.thresholded_image[j] > threshold
+                elif analysis.stack_behaviour == "Slice" and analysis.threshold_method != "None":
+                    threshold = threshold_methods[analysis.threshold_method](analysis.thresholded_image[j])
+                    analysis.thresholded_image[j] = analysis.thresholded_image[j] > threshold
+                    print(j, threshold, end = ", ")
                 
                 if analysis.erode > 0:
                     for k in range(analysis.erode):
                         analysis.thresholded_image[j] = ski.morphology.erosion(analysis.thresholded_image[j])
+            if analysis.stack_behaviour == "Slice": print("\n")
         self.analysed = True
         print("Thresholding Completed\n")
 

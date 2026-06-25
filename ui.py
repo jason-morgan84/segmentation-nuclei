@@ -674,7 +674,7 @@ class MainWindow(QMainWindow):
                 self.draw_image()
                       
             class threshold_analysis:
-                def __init__(self, parent, index, name, analysis_name, bg_subtract, bg_radius, sigma, erode, threshold_method):
+                def __init__(self, parent, index, name, analysis_name, bg_subtract, bg_radius, sigma, erode, threshold_method,stack_behaviour):
                     self.parent = parent
 
                     self.frame = QGroupBox(name)
@@ -704,18 +704,25 @@ class MainWindow(QMainWindow):
                     self.gauss_layout = QtWidgets.QHBoxLayout()
                     self.gauss_label = QtWidgets.QLabel("Sigma:")
                     self.gauss_sigma_input = QtWidgets.QLineEdit(str(sigma))
-                    self.gauss_sigma_input.setMaximumWidth(80)
+                    self.gauss_sigma_input.setMaximumWidth(60)
                     self.gauss_sigma_input.textChanged.connect(lambda: parent.setting_change(settings.analysis, "sigma", parent.str_to_float(self.gauss_sigma_input.text()), index))
-                    self.gauss_layout.addWidget(self.gauss_label)
-                    self.gauss_layout.addWidget(self.gauss_sigma_input)
-
-                    self.erode_layout = QtWidgets.QHBoxLayout()
                     self.erode_label = QtWidgets.QLabel("Erode:")
                     self.erode_input = QtWidgets.QLineEdit(str(erode))
-                    self.erode_input.setMaximumWidth(40)
+                    self.erode_input.setMaximumWidth(60)
                     self.erode_input.textChanged.connect(lambda: parent.setting_change(settings.analysis, "erode", parent.str_to_int(self.erode_input.text()), index))
-                    self.erode_layout.addWidget(self.erode_label)
-                    self.erode_layout.addWidget(self.erode_input)
+                    self.gauss_layout.addWidget(self.gauss_label)
+                    self.gauss_layout.addWidget(self.gauss_sigma_input)
+                    self.gauss_layout.addWidget(self.erode_label)
+                    self.gauss_layout.addWidget(self.erode_input)
+
+                    self.stack_layout = QtWidgets.QHBoxLayout()
+                    self.stack_label = QtWidgets.QLabel("Threshold by:")
+                    self.stack_input = QtWidgets.QComboBox()
+                    self.stack_input.addItems(['Stack', 'Slice'])
+                    self.stack_input.setCurrentText(stack_behaviour)
+                    self.stack_input.currentTextChanged.connect(lambda: parent.setting_change(settings.analysis, "stack behaviour", self.stack_input.currentText(), index))
+                    self.stack_layout.addWidget(self.stack_label)
+                    self.stack_layout.addWidget(self.stack_input)
 
                     self.method_layout = QtWidgets.QHBoxLayout()
                     self.method_label = QtWidgets.QLabel("Method:")
@@ -729,7 +736,7 @@ class MainWindow(QMainWindow):
                     self.layout.addLayout(self.name_layout)
                     self.layout.addLayout(self.background_subtraction_layout)
                     self.layout.addLayout(self.gauss_layout)
-                    self.layout.addLayout(self.erode_layout)
+                    self.layout.addLayout(self.stack_layout)
                     self.layout.addLayout(self.method_layout)
                     self.frame.setLayout(self.layout)
 
@@ -756,7 +763,8 @@ class MainWindow(QMainWindow):
                                                                        bg_radius = settings.analysis["background_radius"][i],
                                                                        sigma = settings.analysis["sigma"][i],
                                                                        erode = settings.analysis["erode"][i],
-                                                                       threshold_method = settings.analysis["threshold"][i]))
+                                                                       threshold_method = settings.analysis["threshold"][i],
+                                                                       stack_behaviour=settings.analysis["stack behaviour"][i],))
 
             self.threshold_layout.addWidget(button_threshold)
             for i in range(settings.analysis["n_analyses"]):

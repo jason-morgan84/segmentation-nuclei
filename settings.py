@@ -28,6 +28,7 @@ analysis = {"n_analyses": 3,
             "background_radius": [5,5,5],                               #window.thresh_analysis_section[].background_radius_input.text()
             "sigma": [3,3,3],                                           #window.thresh_analysis_section[].gauss_sigma_input.text()
             "erode": [0,0,0],                                           #window.thresh_analysis_section[].erode_input.text()
+            "stack behaviour": ["Stack", "Stack", "Stack"],
 
             "measure_intensity": True,                                  #window.intensity_enable.isChecked()
             "intensity_channel": "InR"}                                 #window.intensity_analysis_input.currentText()
