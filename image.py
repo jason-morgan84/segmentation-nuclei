@@ -4,6 +4,7 @@ import skimage as ski
 import numpy as np
 import os
 import settings
+import thresholds
 
 class ImageProcessing():
     def __init__(self):
@@ -327,6 +328,11 @@ class ImageProcessing():
         self.segmented = True
 
     def threshold(self):
+        import thresholds
+
+        t = thresholds.MaxEntropy(self.input_image[0][1])
+        print(t)
+
 
         # Goes through each analysis, first gets thresholding values from z-projected stack (so consistent thresholding values can 
         # be used based on the brightest values for the whole stack)
@@ -334,9 +340,10 @@ class ImageProcessing():
         
         #for i in range (settings.analysis["n_analyses"]):
             #self.analyses.append(self.AnalysisData(self, i))
-
+        
         threshold_methods = {"Li": ski.filters.threshold_li, 
                              "Isodata": ski.filters.threshold_isodata,
+                             "Max Entropy": thresholds.MaxEntropy,
                              "Mean": ski.filters.threshold_mean, 
                              "Minimum": ski.filters.threshold_minimum,
                              "Triangle": ski.filters.threshold_triangle,
@@ -396,7 +403,7 @@ class ImageProcessing():
             if analysis.stack_behaviour == "Slice": print("\n")
         self.analysed = True
         print("Thresholding Completed\n")
-
+        
     def quantify_threshold(self):
         # for each analysis, goes through each slice for each labelled region and looks for maximum area, maximum 
         # intensity of thresholded image and, if absolute image intensity is being measured, the maximum intensity from the input image

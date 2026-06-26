@@ -8,9 +8,9 @@
 # PB[t] = sum(pi[1 to t])
 # PF[t] = sum(pi[t+1 to n])
 
-# calculate entropy for foreground and background 
-# EB[t] = - sum { (pi[i]/PB[i])*ln(pi[i]/PB[i])} where i = 1 to t
-# EF[t] = - sum { (pi[i]/PF[i])*ln(pi[i]/PF[i])} where i = t + 1 to 256
+# calculate entropy for foreground and background (only where there's data in the histogram to avoid divide by 0/natural log of 0)
+# EB[t] = - sum { (pi[i]/PB[t])*ln(pi[i]/PB[t])} where i = 1 to t
+# EF[t] = - sum { (pi[i]/PF[t])*ln(pi[i]/PF[t])} where i = t + 1 to 256
 
 # calculat total entropy 
 # E[t] = EB[t] + EF[t]
@@ -18,27 +18,53 @@
 # find the value of t with biggest E
 
 import numpy as np
+import math
 
 def MaxEntropy(image):
 
     N = 0
     n = 256
 
+    PI = np.zeros(n)
+
     PB = np.zeros(n)
     PF = np.zeros(n)
 
-    EB = np.zeros(n)
-    EF = np.zeros(n)
+    EB = 0
+    EF = 0
 
-    E = np.zeros(n)
+    E = 0
 
-    t = 0
+    threshold_bin = 0
 
-    histogram = np.histogram(image, bins = 256)
+    histogram, _ = np.histogram(image, bins = 256, range = (0, 256))
 
-    for bin in histogram:
-        N += bin
+    N = histogram.sum()
 
-    
+    for t, bin in enumerate(histogram):
+        PI[t] = bin/N
 
-    return t
+    PB[0] = PI[0]
+    PF[0] = 1 - PB[0]
+
+
+    for t in range(1, n):
+        PB[t] = PB[t - 1] + PI[t]
+        PF[t] = 1 - PB[t]
+
+    for t in range(1, n):
+        EB = 0
+        for i in range (0, t):
+            if histogram[i] != 0: EB += PI[i]/PB[t] * math.log(PI[i]/PB[t])
+        EB = EB * -1
+
+        EF = 0
+        for i in range (t + 1, n):
+            if histogram[i] != 0: EF += PI[i]/PF[t] * math.log(PI[i]/PF[t])
+        EF = EF * -1
+
+        if (EF + EB) > E:
+            E = EF + EB
+            threshold_bin = t
+
+    return threshold_bin + 1

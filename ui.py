@@ -727,7 +727,7 @@ class MainWindow(QMainWindow):
                     self.method_layout = QtWidgets.QHBoxLayout()
                     self.method_label = QtWidgets.QLabel("Method:")
                     self.method_input = QtWidgets.QComboBox()
-                    self.method_input.addItems(['None', 'Isodata', 'Li', 'Mean','Minimum','Otsu','Triangle','Yen'])
+                    self.method_input.addItems(['None', 'Isodata', 'Li', 'Max Entropy','Mean','Minimum','Otsu','Triangle','Yen'])
                     self.method_input.setCurrentText(threshold_method)
                     self.method_input.currentTextChanged.connect(lambda: parent.setting_change(settings.analysis, "threshold", self.method_input.currentText(), index))
                     self.method_layout.addWidget(self.method_label)
