@@ -1,26 +1,28 @@
-#get N = sum of each histogram bin (should also equal number of pixels in image)
-#n = number of histogram bins (255)
 
-#for each grey level frequency fi, get pi = fi/N (i = 1 to 256)
-
-
-#calculate cumulative probabilities for each potential threshold (t = 1-256) (or 0 - 255?) for foreground (F[t]) and background (B[t]):
-# PB[t] = sum(pi[1 to t])
-# PF[t] = sum(pi[t+1 to n])
-
-# calculate entropy for foreground and background (only where there's data in the histogram to avoid divide by 0/natural log of 0)
-# EB[t] = - sum { (pi[i]/PB[t])*ln(pi[i]/PB[t])} where i = 1 to t
-# EF[t] = - sum { (pi[i]/PF[t])*ln(pi[i]/PF[t])} where i = t + 1 to 256
-
-# calculat total entropy 
-# E[t] = EB[t] + EF[t]
-
-# find the value of t with biggest E
 
 import numpy as np
 import math
 
 def MaxEntropy(image):
+
+    """A new method for gray-level picture thresholding using the entropy of the histogram N. Kapur, P.K. Sahoo, A.K.C. Wong"""
+    #get N = sum of each histogram bin (should also equal number of pixels in image)
+    #n = number of histogram bins (255)
+
+    #for each grey level frequency fi, get pi = fi/N (i = 1 to 256)
+
+    #calculate cumulative probabilities for each potential threshold (t = 1-256) (or 0 - 255?) for foreground (F[t]) and background (B[t]):
+    # PB[t] = sum(pi[1 to t])
+    # PF[t] = sum(pi[t+1 to n])
+
+    # calculate entropy for foreground and background (only where there's data in the histogram to avoid divide by 0/natural log of 0)
+    # EB[t] = - sum { (pi[i]/PB[t])*ln(pi[i]/PB[t])} where i = 1 to t
+    # EF[t] = - sum { (pi[i]/PF[t])*ln(pi[i]/PF[t])} where i = t + 1 to 256
+
+    # calculat total entropy 
+    # E[t] = EB[t] + EF[t]
+
+    # find the value of t with biggest E
 
     N = 0
     n = 256
