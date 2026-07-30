@@ -374,7 +374,7 @@ class ImageProcessing():
                 else:
                     threshold = 0
            
-                print(threshold)
+                #print(threshold)
 
             for j in range(self.n_slices):
 
