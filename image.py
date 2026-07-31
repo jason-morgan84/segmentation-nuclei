@@ -328,12 +328,6 @@ class ImageProcessing():
         self.segmented = True
 
     def threshold(self):
-        import thresholds
-
-        t = thresholds.MaxEntropy(self.input_image[0][1])
-        print(t)
-
-
         # Goes through each analysis, first gets thresholding values from z-projected stack (so consistent thresholding values can 
         # be used based on the brightest values for the whole stack)
         # Each slice is then thresholded based on the calculated value
@@ -374,7 +368,7 @@ class ImageProcessing():
                 else:
                     threshold = 0
            
-                #print(threshold)
+                print(threshold)
 
             for j in range(self.n_slices):
 
